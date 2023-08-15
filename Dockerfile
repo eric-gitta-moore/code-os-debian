@@ -155,6 +155,11 @@ USER root
 RUN sudo apt update && sudo apt install -y gcc g++ make cmake gdb
 USER ${USER_NAME}
 
+# =========== 配置 gui =============
+USER root
+RUN sudo apt update && sudo apt install -y x11-apps
+USER ${USER_NAME}
+
 # =========== 配置 guifont =============
 
 
