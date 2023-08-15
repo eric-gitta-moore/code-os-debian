@@ -119,12 +119,22 @@ RUN wget -O ~/conda.sh ${CONDA_INSTALLER_URL} && \
     conda init zsh
 
 # =========== 配置 nvm =============
-RUN curl -o- ${NVM_INSTALLER_URL} | bash
+RUN curl -o- ${NVM_INSTALLER_URL} | bash && \
+    source ~/.zshrc && \
+    nvm install --lts && \
+    nvm install lts/gallium && \
+    nvm use lts/gallium
+
+RUN npm config set -g registry https://registry.npmmirror.com && \
+    npm i -g yarn pnpm && \
+    yarn config set registry https://registry.npmmirror.com -g && \
+    pnpm config set registry https://registry.npmmirror.com -g
 
 # =========== 配置 jenv =============
 RUN git clone https://github.com/jenv/jenv.git ~/.jenv && \
     echo 'export PATH="$HOME/.jenv/bin:$PATH"' >> ~/.zshrc && \
-    echo 'eval "$(jenv init -)"' >> ~/.zshrc
+    echo 'eval "$(jenv init -)"' >> ~/.zshrc && \
+    source ~/.zshrc
 
 # =========== 配置 java =============
 USER root
