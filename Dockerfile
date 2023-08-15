@@ -161,7 +161,11 @@ RUN sudo apt update && sudo apt install -y x11-apps
 USER ${USER_NAME}
 
 # =========== 配置 guifont =============
-
+USER root
+COPY src/local.conf /etc/fonts/
+COPY src/fonts/* /usr/share/fonts/custom
+RUN sudo fc-cache -f -v
+USER ${USER_NAME}
 
 # =========== 配置 binfmt =============
 

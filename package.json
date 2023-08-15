@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "docker:run": "docker run -d -v /tmp/.X11-unix:/tmp/.X11-unix -v /mnt/wslg:/mnt/wslg -e DISPLAY=unix$DISPLAY code-os-debian",
-    "docker:build": "docker -t code-os-debian --progress auto ."
+    "docker:build": "docker build -t code-os-debian --progress auto ."
   },
   "repository": {
     "type": "git",
