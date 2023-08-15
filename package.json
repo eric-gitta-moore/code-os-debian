@@ -1,0 +1,20 @@
+{
+  "name": "code-os-debian",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "docker:run": "docker run -d -v /tmp/.X11-unix:/tmp/.X11-unix -v /mnt/wslg:/mnt/wslg -e DISPLAY=unix$DISPLAY code-os-debian",
+    "docker:build": "docker -t code-os-debian --progress auto ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/james-curtis/code-os-debian.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/james-curtis/code-os-debian/issues"
+  },
+  "homepage": "https://github.com/james-curtis/code-os-debian#readme"
+}
