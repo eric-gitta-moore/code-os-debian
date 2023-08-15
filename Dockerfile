@@ -2,7 +2,8 @@ FROM debian:12 AS base
 
 ARG USER_PWD=linux \
     USER_NAME=linux \
-    CONDA_INSTALLER_URL=https://repo.anaconda.com/miniconda/Miniconda3-py39_23.5.2-0-Linux-x86_64.sh
+    CONDA_INSTALLER_URL=https://repo.anaconda.com/miniconda/Miniconda3-py39_23.5.2-0-Linux-x86_64.sh \
+    NVM_INSTALLER_URL=https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.4/install.sh
 
 ENV SHELL=/bin/bash
 
@@ -91,12 +92,24 @@ export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 EOF
 
+# 忽略 p10k 的配置向导
+RUN echo '\n\nPOWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true' >> ~/.zshrc
+
 
 # =========== 配置中文环境 =============
 RUN cat <<'EOF' > ~/.cnrc
 export LC_ALL=zh_CN.UTF-8
 export LANG=zh_CN.UTF-8
 EOF
+
+USER root
+RUN sudo apt update && sudo apt install -y fonts-wqy-zenhei fonts-wqy-microhei locales dialog apt-utils man manpages-zh && \
+    echo 'locales locales/locales_to_be_generated multiselect en_US.UTF-8 UTF-8, zh_CN.UTF-8 UTF-8' | debconf-set-selections && \
+    echo 'locales locales/default_environment_locale select en_US.UTF-8' | debconf-set-selections && \
+    rm "/etc/locale.gen" && \
+    dpkg-reconfigure --frontend=noninteractive locales
+
+USER ${USER_NAME}
 
 
 # =========== 配置 conda =============
@@ -106,9 +119,31 @@ RUN wget -O ~/conda.sh ${CONDA_INSTALLER_URL} && \
     conda init zsh
 
 # =========== 配置 nvm =============
+RUN curl -o- ${NVM_INSTALLER_URL} | bash
+
 # =========== 配置 jenv =============
+RUN git clone https://github.com/jenv/jenv.git ~/.jenv && \
+    echo 'export PATH="$HOME/.jenv/bin:$PATH"' >> ~/.zshrc && \
+    echo 'eval "$(jenv init -)"' >> ~/.zshrc
+
+# =========== 配置 java =============
+USER root
+RUN wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | sudo tee /etc/apt/keyrings/adoptium.asc && \
+    echo "deb [signed-by=/etc/apt/keyrings/adoptium.asc] https://mirror.nju.edu.cn/adoptium/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | sudo tee /etc/apt/sources.list.d/adoptium.list && \
+    sudo apt update && \
+    sudo apt install -y temurin-17-jdk temurin-11-jdk temurin-8-jdk
+USER ${USER_NAME}
+
 # =========== 配置 c++ =============
+USER root
+RUN sudo apt update && sudo apt install -y gcc g++ make cmake gdb
+USER ${USER_NAME}
+
 # =========== 配置 guifont =============
+
+
 # =========== 配置 binfmt =============
+
+
 
 CMD [ "tail", "-f", "/dev/null" ]
