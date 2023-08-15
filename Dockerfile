@@ -5,6 +5,7 @@ ARG USER_PWD=linux \
     CONDA_INSTALLER_URL=https://repo.anaconda.com/miniconda/Miniconda3-py39_23.5.2-0-Linux-x86_64.sh \
     NVM_INSTALLER_URL=https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.4/install.sh
 
+SHELL ["/bin/bash", "-c"]
 ENV SHELL=/bin/bash
 
 # =========== 换源 =============
@@ -54,6 +55,7 @@ RUN apt update
 
 # =========== 配置 zsh =============
 
+SHELL ["/usr/bin/zsh", "-c"]
 ENV SHELL=/usr/bin/zsh
 
 RUN useradd -ms /bin/bash ${USER_NAME} && \
@@ -123,9 +125,9 @@ RUN curl -o- ${NVM_INSTALLER_URL} | bash && \
     source ~/.zshrc && \
     nvm install --lts && \
     nvm install lts/gallium && \
-    nvm use lts/gallium
-
-RUN npm config set -g registry https://registry.npmmirror.com && \
+    nvm use lts/gallium && \
+    : && \
+    npm config set -g registry https://registry.npmmirror.com && \
     npm i -g yarn pnpm && \
     yarn config set registry https://registry.npmmirror.com -g && \
     pnpm config set registry https://registry.npmmirror.com -g
@@ -143,9 +145,9 @@ RUN git clone https://github.com/jenv/jenv.git ~/.jenv && \
     echo 'export PATH="$HOME/.jenv/bin:$PATH"' >> ~/.zshrc && \
     echo 'eval "$(jenv init -)"' >> ~/.zshrc && \
     source ~/.zshrc && \
-    jenv add /usr/lib/jvm/temurin-8-jdk-amd64/bin/java && \
-    jenv add /usr/lib/jvm/temurin-11-jdk-amd64/bin/java && \
-    jenv add /usr/lib/jvm/temurin-17-jdk-amd64/bin/java && \
+    jenv add /usr/lib/jvm/temurin-8-jdk-amd64 && \
+    jenv add /usr/lib/jvm/temurin-11-jdk-amd64 && \
+    jenv add /usr/lib/jvm/temurin-17-jdk-amd64 && \
     jenv global 11
 
 # =========== 配置 c++ =============
