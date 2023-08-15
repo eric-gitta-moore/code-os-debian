@@ -130,12 +130,6 @@ RUN npm config set -g registry https://registry.npmmirror.com && \
     yarn config set registry https://registry.npmmirror.com -g && \
     pnpm config set registry https://registry.npmmirror.com -g
 
-# =========== 配置 jenv =============
-RUN git clone https://github.com/jenv/jenv.git ~/.jenv && \
-    echo 'export PATH="$HOME/.jenv/bin:$PATH"' >> ~/.zshrc && \
-    echo 'eval "$(jenv init -)"' >> ~/.zshrc && \
-    source ~/.zshrc
-
 # =========== 配置 java =============
 USER root
 RUN wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | sudo tee /etc/apt/keyrings/adoptium.asc && \
@@ -143,6 +137,16 @@ RUN wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | sud
     sudo apt update && \
     sudo apt install -y temurin-17-jdk temurin-11-jdk temurin-8-jdk
 USER ${USER_NAME}
+
+# =========== 配置 jenv =============
+RUN git clone https://github.com/jenv/jenv.git ~/.jenv && \
+    echo 'export PATH="$HOME/.jenv/bin:$PATH"' >> ~/.zshrc && \
+    echo 'eval "$(jenv init -)"' >> ~/.zshrc && \
+    source ~/.zshrc && \
+    jenv add /usr/lib/jvm/temurin-8-jdk-amd64/bin/java && \
+    jenv add /usr/lib/jvm/temurin-11-jdk-amd64/bin/java && \
+    jenv add /usr/lib/jvm/temurin-17-jdk-amd64/bin/java && \
+    jenv global 11
 
 # =========== 配置 c++ =============
 USER root
