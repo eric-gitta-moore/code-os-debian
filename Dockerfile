@@ -171,7 +171,7 @@ COPY src/fonts/* /usr/share/fonts/custom
 RUN sudo fc-cache -f -v
 USER ${USER_NAME}
 
-# =========== 配置 binfmt =============
+# =========== @deprecated 配置 binfmt（wsl2 中非 Ubuntu 系统会有这个问题，无法启动 systemd）=============
 
 
 # =========== 配置 容器卷 =============
