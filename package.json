@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "docker:run": "docker run -d -v /tmp/.X11-unix:/tmp/.X11-unix -v /mnt/wslg:/mnt/wslg -e DISPLAY=unix$DISPLAY code-os-debian",
+    "docker":"docker run -d --network host -v ~/.ssh:/home/linux/.ssh -v ~/workspace:/mnt/workspace",
+    "docker:win-run": "npm run docker -- -v /tmp/.X11-unix:/tmp/.X11-unix -v /mnt/wslg:/mnt/wslg -e DISPLAY=unix$DISPLAY code-os-debian",
+    "docker:mac-run": "npm run docker -- code-os-debian",
     "docker:build": "docker build -t code-os-debian --progress auto ."
   },
   "repository": {

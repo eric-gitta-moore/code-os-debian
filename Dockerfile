@@ -3,7 +3,8 @@ FROM debian:12 AS base
 ARG USER_PWD=linux \
     USER_NAME=linux \
     CONDA_INSTALLER_URL=https://repo.anaconda.com/miniconda/Miniconda3-py39_23.5.2-0-Linux-x86_64.sh \
-    NVM_INSTALLER_URL=https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.4/install.sh
+    NVM_INSTALLER_URL=https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.4/install.sh \ 
+    NVM_NODEJS_ORG_MIRROR=https://npmmirror.com/mirrors/node/
 
 SHELL ["/bin/bash", "-c"]
 ENV SHELL=/bin/bash
@@ -92,6 +93,9 @@ fi
 # 设置语言
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
+
+# nvm mirror
+export NVM_NODEJS_ORG_MIRROR=${NVM_NODEJS_ORG_MIRROR}
 EOF
 
 # 忽略 p10k 的配置向导
@@ -169,6 +173,9 @@ USER ${USER_NAME}
 
 # =========== 配置 binfmt =============
 
+
+# =========== 配置 容器卷 =============
+VOLUME [ "/mnt/workspace" ]
 
 
 CMD [ "tail", "-f", "/dev/null" ]
