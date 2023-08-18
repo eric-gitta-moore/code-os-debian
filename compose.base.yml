@@ -1,0 +1,14 @@
+services:
+  os:
+    build: ./code-os
+    volumes:
+      - ~/.ssh:/home/linux/.ssh:rw
+      - ~/workspace:/mnt/workspace:rw
+      - /tmp/.X11-unix:/tmp/.X11-unix:ro
+      - os-data:/mnt/data:rw
+    network_mode: "host"
+    environment:
+      DISPLAY: host.docker.internal:0
+
+volumes:
+  os-data: 
