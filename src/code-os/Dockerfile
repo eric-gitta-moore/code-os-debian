@@ -96,9 +96,6 @@ fi
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 
-# nvm mirror
-export NVM_NODEJS_ORG_MIRROR=${NVM_NODEJS_ORG_MIRROR}
-
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 EOF
@@ -111,6 +108,12 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+EOF
+
+RUN cat <<"EOF" >> ~/.zshrc
+
+# nvm mirror
+export NVM_NODEJS_ORG_MIRROR=${NVM_NODEJS_ORG_MIRROR}
 EOF
 
 COPY src/zsh/.p10k.zsh /home/${USER_NAME}/
