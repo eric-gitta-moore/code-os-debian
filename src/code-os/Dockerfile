@@ -158,7 +158,7 @@ EOF
 # pdm
 RUN source ~/.zshrc && \
     curl -sSL https://pdm.fming.dev/install-pdm.py | python3 - && \
-    echo '\n\nexport PATH=/home/linux/.local/bin:$PATH' >> ~/.zshrc && \
+    echo '\n\nexport PATH=$HOME/.local/bin:$PATH' >> ~/.zshrc && \
     source ~/.zshrc && \
     pdm config pypi.url https://mirror.nju.edu.cn/pypi/web/simple && \
     pip config set global.index-url https://mirror.nju.edu.cn/pypi/web/simple
@@ -170,8 +170,8 @@ RUN source ~/.zshrc && \
     mkdir -p $CONDA_PREFIX/etc/conda/activate.d && \
     echo 'CUDNN_PATH=$(dirname $(python -c "import nvidia.cudnn;print(nvidia.cudnn.__file__)"))' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
     echo 'export LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
-    source $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
-
+    source $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
+    mv $CONDA_PREFIX/lib/libtinfo.so.6 $CONDA_PREFIX/lib/libtinfo.so.6.bak # 临时解决报错：lib/libtinfo.so.6: no version information available (required by bash)
 
 # pytorch
 RUN source ~/.zshrc && \
