@@ -7,6 +7,7 @@ services:
       - ~/workspace:/mnt/workspace:rw
       - /tmp/.X11-unix:/tmp/.X11-unix:ro
       - os-data:/mnt/data:rw
+      - /var/run/docker.sock:/var/run/docker.sock
     network_mode: "host"
 
 volumes:

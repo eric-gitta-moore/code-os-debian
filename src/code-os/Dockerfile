@@ -190,6 +190,20 @@ USER ${USER_NAME}
 # =========== @deprecated 配置 binfmt（wsl2 中非 Ubuntu 系统会有这个问题，无法启动 systemd）=============
 
 
+# =========== 配置 docker =============
+USER root
+RUN sudo apt-get update && sudo apt-get install -y ca-certificates curl gnupg && \
+    sudo install -m 0755 -d /etc/apt/keyrings && \
+    curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
+    sudo chmod a+r /etc/apt/keyrings/docker.gpg && \
+    echo \
+    "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://mirror.nju.edu.cn/docker-ce/linux/debian \
+    "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null && \
+    sudo apt-get update && \
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+USER ${USER_NAME}
+
 # =========== 配置 常用工具 =============
 USER root
 RUN sudo apt update && sudo apt install -y rsync iputils-ping bind9-dnsutils htop screen openssh-server && \
