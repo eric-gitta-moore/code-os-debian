@@ -181,8 +181,10 @@ RUN source ~/.zshrc && \
 RUN curl -o- ${NVM_INSTALLER_URL} | bash && \
     source ~/.zshrc && \
     nvm install --lts && \
-    nvm install lts/gallium && \
-    nvm use lts/gallium && \
+    nvm install 16 && \
+    nvm install 14 && \
+    nvm install 10 && \
+    nvm use 16 && \
     : && \
     npm config set -g registry https://registry.npmmirror.com && \
     npm i -g yarn pnpm && \
