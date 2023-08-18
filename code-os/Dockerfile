@@ -175,7 +175,7 @@ USER ${USER_NAME}
 
 
 # =========== 配置 容器卷 =============
-VOLUME [ "/mnt/workspace", "/mnt/not_mount" ]
+VOLUME [ "/mnt/workspace", "/mnt/data" ]
 
 
 CMD [ "tail", "-f", "/dev/null" ]

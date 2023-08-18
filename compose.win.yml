@@ -1,0 +1,9 @@
+include:
+  - compose.base.yml
+
+services:
+  os:
+    volumes:
+      - /mnt/wslg:/mnt/wslg:ro
+    environment:
+      DISPLAY: unix${DISPLAY}
