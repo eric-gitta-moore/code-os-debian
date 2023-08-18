@@ -1,9 +1,12 @@
 FROM debian:12 AS base
 
+# 使用原地址 GITCLONE_MIIOR=
+ARG GITCLONE_MIRROR=https://ghproxy.com/
+
 ARG USER_PWD=linux \
     USER_NAME=linux \
     CONDA_INSTALLER_URL=https://mirror.nju.edu.cn/anaconda/miniconda/Miniconda3-py39_23.5.2-0-Linux-x86_64.sh \
-    NVM_INSTALLER_URL=https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.4/install.sh \ 
+    NVM_INSTALLER_URL=${GITCLONE_MIRROR}https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.4/install.sh \ 
     NVM_NODEJS_ORG_MIRROR=https://npmmirror.com/mirrors/node/
 
 SHELL ["/bin/bash", "-c"]
@@ -74,11 +77,11 @@ RUN echo "${USER_PWD}" | chsh -s $(which zsh)
 WORKDIR /home/${USER_NAME}
 
 # ohmyzsh
-RUN echo 'Y' | sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
-    git clone https://github.com/skywind3000/z.lua.git ~/z.lua && \
-    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions && \
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting && \
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k && \
+RUN echo 'Y' | sh -c "$(curl -fsSL ${GITCLONE_MIRROR}https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
+    git clone ${GITCLONE_MIRROR}https://github.com/skywind3000/z.lua.git ~/z.lua && \
+    git clone ${GITCLONE_MIRROR}https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions && \
+    git clone ${GITCLONE_MIRROR}https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting && \
+    git clone --depth=1 ${GITCLONE_MIRROR}https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k && \
     sed -i.bak 's/plugins=(git)/plugins=(\ngit\ncommand-not-found\ncolored-man-pages\nvi-mode\nzsh-autosuggestions\nzsh-syntax-highlighting\n)/' ~/.zshrc && \
     sed -i 's#ZSH_THEME="robbyrussell"#ZSH_THEME="powerlevel10k/powerlevel10k"#' ~/.zshrc
 
@@ -195,7 +198,7 @@ RUN wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | sud
 USER ${USER_NAME}
 
 # =========== 配置 jenv =============
-RUN git clone https://github.com/jenv/jenv.git ~/.jenv && \
+RUN git clone ${GITCLONE_MIRROR}https://github.com/jenv/jenv.git ~/.jenv && \
     echo 'export PATH="$HOME/.jenv/bin:$PATH"' >> ~/.zshrc && \
     echo 'eval "$(jenv init -)"' >> ~/.zshrc && \
     source ~/.zshrc && \
@@ -240,7 +243,9 @@ USER ${USER_NAME}
 
 # =========== 配置 常用工具 =============
 USER root
-RUN sudo apt update && sudo apt install -y rsync iputils-ping bind9-dnsutils htop screen openssh-server && \
+RUN sudo apt update && \
+    sudo apt install -y \ 
+    rsync iputils-ping bind9-dnsutils htop screen openssh-server tree && \
     sed -i.bak 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 USER ${USER_NAME}
 
