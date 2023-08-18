@@ -110,7 +110,7 @@ fi
 
 EOF
 
-RUN cat <<"EOF" >> ~/.zshrc
+RUN cat <<EOF >> ~/.zshrc
 
 # nvm mirror
 export NVM_NODEJS_ORG_MIRROR=${NVM_NODEJS_ORG_MIRROR}
