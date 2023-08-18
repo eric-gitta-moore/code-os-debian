@@ -138,7 +138,38 @@ USER ${USER_NAME}
 RUN wget -O ~/conda.sh ${CONDA_INSTALLER_URL} && \
     sh ~/conda.sh -b && \
     eval "$(~/miniconda3/bin/conda shell.zsh hook)" && \
-    conda init zsh
+    conda init zsh && \
+    cat <<'EOF' > ~/.condarc
+channels:
+  - defaults
+show_channel_urls: true
+default_channels:
+  - https://mirror.nju.edu.cn/anaconda/pkgs/main
+  - https://mirror.nju.edu.cn/anaconda/pkgs/r
+  - https://mirror.nju.edu.cn/anaconda/pkgs/msys2
+custom_channels:
+  conda-forge: https://mirror.nju.edu.cn/anaconda/cloud
+  pytorch: https://mirror.nju.edu.cn/anaconda/cloud
+EOF
+
+# pdm
+RUN curl -sSL https://pdm.fming.dev/install-pdm.py | python3 - && \
+    echo '\n\nexport PATH=/home/linux/.local/bin:$PATH' >> ~/.zshrc && \
+    source ~/.zshrc && \
+    pdm config pypi.url https://mirror.nju.edu.cn/pypi/web/simple && \
+    pip config set global.index-url https://mirror.nju.edu.cn/pypi/web/simple
+
+# TensorFlow for python==3.9
+RUN conda install -c conda-forge cudatoolkit=11.8.0 && \
+    python3 -m pip install nvidia-cudnn-cu11==8.6.0.163 tensorflow==2.13 && \
+    mkdir -p $CONDA_PREFIX/etc/conda/activate.d && \
+    echo 'CUDNN_PATH=$(dirname $(python -c "import nvidia.cudnn;print(nvidia.cudnn.__file__)"))' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
+    echo 'export LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
+    source $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
+
+
+# pytorch
+RUN conda install pytorch torchvision torchaudio cpuonly -c pytorch -y
 
 # =========== 配置 nvm =============
 RUN curl -o- ${NVM_INSTALLER_URL} | bash && \
