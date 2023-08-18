@@ -8,6 +8,7 @@ ARG USER_PWD=linux \
 
 SHELL ["/bin/bash", "-c"]
 ENV SHELL=/bin/bash
+USER root
 
 # =========== 换源 =============
 # http
@@ -63,7 +64,8 @@ RUN useradd -ms /bin/bash ${USER_NAME} && \
     usermod -aG sudo ${USER_NAME} && \
     echo "${USER_NAME}:${USER_PWD}" | chpasswd && \
     echo "root:${USER_PWD}" | chpasswd && \
-    echo "${USER_PWD}" | chsh -s $(which zsh)
+    echo "${USER_PWD}" | chsh -s $(which zsh) && \
+    apt update && apt install command-not-found -y && apt update
 
 USER ${USER_NAME}
 
@@ -96,11 +98,22 @@ export LANG=en_US.UTF-8
 
 # nvm mirror
 export NVM_NODEJS_ORG_MIRROR=${NVM_NODEJS_ORG_MIRROR}
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 EOF
 
-# 忽略 p10k 的配置向导
-RUN echo '\n\nPOWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true' >> ~/.zshrc
+RUN cat <<'EOF' | cat - ~/.zshrc > ~/.zshrc.tmp && mv ~/.zshrc.tmp ~/.zshrc
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
 
+EOF
+
+COPY src/zsh/.p10k.zsh ~/
 
 # =========== 配置中文环境 =============
 RUN cat <<'EOF' > ~/.cnrc
@@ -173,6 +186,12 @@ USER ${USER_NAME}
 
 # =========== @deprecated 配置 binfmt（wsl2 中非 Ubuntu 系统会有这个问题，无法启动 systemd）=============
 
+
+# =========== 配置 常用工具 =============
+USER root
+RUN sudo apt update && sudo apt install -y rsync iputils-ping bind9-dnsutils htop screen openssh-server && \
+    sed -i.bak 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+USER ${USER_NAME}
 
 # =========== 配置 容器卷 =============
 VOLUME [ "/mnt/workspace", "/mnt/data" ]
