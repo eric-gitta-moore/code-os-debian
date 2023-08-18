@@ -71,7 +71,7 @@ USER ${USER_NAME}
 
 RUN echo "${USER_PWD}" | chsh -s $(which zsh)
 
-WORKDIR ~
+WORKDIR /home/${USER_NAME}
 
 # ohmyzsh
 RUN echo 'Y' | sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
@@ -113,7 +113,7 @@ fi
 
 EOF
 
-COPY src/zsh/.p10k.zsh ~/
+COPY src/zsh/.p10k.zsh /home/${USER_NAME}/
 
 # =========== 配置中文环境 =============
 RUN cat <<'EOF' > ~/.cnrc
@@ -180,7 +180,7 @@ USER ${USER_NAME}
 # =========== 配置 guifont =============
 USER root
 COPY src/local.conf /etc/fonts/
-COPY src/fonts/* /usr/share/fonts/custom
+COPY src/fonts/* /usr/share/fonts/custom/
 RUN sudo fc-cache -f -v
 USER ${USER_NAME}
 
