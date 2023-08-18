@@ -1,3 +1,4 @@
+name: code-os-debian
 services:
   os:
     build: ../../src/code-os
