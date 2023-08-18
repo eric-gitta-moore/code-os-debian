@@ -153,14 +153,16 @@ custom_channels:
 EOF
 
 # pdm
-RUN curl -sSL https://pdm.fming.dev/install-pdm.py | python3 - && \
+RUN source ~/.zshrc && \
+    curl -sSL https://pdm.fming.dev/install-pdm.py | python3 - && \
     echo '\n\nexport PATH=/home/linux/.local/bin:$PATH' >> ~/.zshrc && \
     source ~/.zshrc && \
     pdm config pypi.url https://mirror.nju.edu.cn/pypi/web/simple && \
     pip config set global.index-url https://mirror.nju.edu.cn/pypi/web/simple
 
 # TensorFlow for python==3.9
-RUN conda install -c conda-forge cudatoolkit=11.8.0 && \
+RUN source ~/.zshrc && \
+    conda install -c conda-forge cudatoolkit=11.8.0 && \
     python3 -m pip install nvidia-cudnn-cu11==8.6.0.163 tensorflow==2.13 && \
     mkdir -p $CONDA_PREFIX/etc/conda/activate.d && \
     echo 'CUDNN_PATH=$(dirname $(python -c "import nvidia.cudnn;print(nvidia.cudnn.__file__)"))' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
@@ -169,7 +171,8 @@ RUN conda install -c conda-forge cudatoolkit=11.8.0 && \
 
 
 # pytorch
-RUN conda install pytorch torchvision torchaudio cpuonly -c pytorch -y
+RUN source ~/.zshrc && \
+    conda install pytorch torchvision torchaudio cpuonly -c pytorch -y
 
 # =========== 配置 nvm =============
 RUN curl -o- ${NVM_INSTALLER_URL} | bash && \
