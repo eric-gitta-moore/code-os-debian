@@ -9,6 +9,11 @@ services:
       - os-data:/mnt/data:rw
       - /var/run/docker.sock:/var/run/docker.sock
     network_mode: "host"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - count: all
 
 volumes:
-  os-data: 
+  os-data:
