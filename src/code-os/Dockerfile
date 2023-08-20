@@ -10,7 +10,8 @@ ARG USER_PWD=linux \
     CONDA_INSTALLER_URL=https://mirror.nju.edu.cn/anaconda/miniconda/Miniconda3-py39_23.5.2-0-Linux-x86_64.sh \
     NVM_INSTALLER_URL=${GITCLONE_MIRROR}https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.4/install.sh \ 
     NVM_NODEJS_ORG_MIRROR=https://npmmirror.com/mirrors/node/ \
-    NVM_SOURCE=${GITCLONE_MIRROR}https://github.com/nvm-sh/nvm.git
+    NVM_SOURCE=${GITCLONE_MIRROR}https://github.com/nvm-sh/nvm.git \
+    TENSORFLOW_PACKAGE=tensorflow==2.13.0
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -207,6 +208,10 @@ RUN system_id=$(. /etc/os-release && echo "$ID") && \
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 USER ${USER_NAME}
 RUN :
+
+# =========== 配置 TensorFlow =============
+RUN source ~/.zshrc && \
+    pip install ${TENSORFLOW_PACKAGE}
 
 # =========== 配置 pytorch =============
 RUN source ~/.zshrc && \
