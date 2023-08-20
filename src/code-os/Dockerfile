@@ -194,6 +194,7 @@ RUN git clone ${GITCLONE_MIRROR}https://github.com/jenv/jenv.git ~/.jenv && \
 # =========== 配置 pytorch =============
 RUN source ~/.zshrc && \
     conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia -y
+RUN :
 
 # =========== 配置 docker =============
 USER root
