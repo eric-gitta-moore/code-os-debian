@@ -8,7 +8,7 @@ ARG USER_PWD=linux \
     CONDA_INSTALLER_URL=https://mirror.nju.edu.cn/anaconda/miniconda/Miniconda3-py39_23.5.2-0-Linux-x86_64.sh \
     NVM_INSTALLER_URL=${GITCLONE_MIRROR}https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.4/install.sh \ 
     NVM_NODEJS_ORG_MIRROR=https://npmmirror.com/mirrors/node/ \
-    NVM_SOURCE = ${GITCLONE_MIRROR}https://github.com/nvm-sh/nvm.git
+    NVM_SOURCE=${GITCLONE_MIRROR}https://github.com/nvm-sh/nvm.git
 
 SHELL ["/bin/bash", "-c"]
 ENV SHELL=/bin/bash
