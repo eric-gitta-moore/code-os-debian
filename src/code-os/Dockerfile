@@ -214,7 +214,7 @@ RUN source ~/.zshrc && \
     if [[ "${GPU_SUPPORT}" == "on" ]]; then \
     conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia -y; \
     fi && \
-    if [[ "${GPU_SUPPORT}" == "on" ]]; then \
+    if [[ "${GPU_SUPPORT}" == "off" ]]; then \
     conda install pytorch torchvision torchaudio cpuonly -c pytorch -y; \
     fi
 
