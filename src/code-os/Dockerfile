@@ -1,6 +1,6 @@
 ARG IMAGE_NAME=tensorflow/tensorflow:latest
-ARG GPU_SUPPORT=off
 FROM ${IMAGE_NAME} AS base
+ARG GPU_SUPPORT=off
 
 # 使用原地址 --build-arg GITCLONE_MIIOR=""
 ARG GITCLONE_MIRROR=https://ghproxy.com/
@@ -210,12 +210,13 @@ RUN :
 
 # =========== 配置 pytorch =============
 RUN source ~/.zshrc && \
-    if [ "$GPU_SUPPORT" = "on" ]; then \
-    conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia -y \
-    endif && \
-    if [ "$GPU_SUPPORT" = "off" ]; then \
-    conda install pytorch torchvision torchaudio cpuonly -c pytorch -y \
-    endif
+    echo "GPU_SUPPORT: ${GPU_SUPPORT}" && \
+    if [[ "${GPU_SUPPORT}" == "on" ]]; then \
+    conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia -y; \
+    fi && \
+    if [[ "${GPU_SUPPORT}" == "on" ]]; then \
+    conda install pytorch torchvision torchaudio cpuonly -c pytorch -y; \
+    fi
 
 
 # =========== 配置 容器卷 =============
