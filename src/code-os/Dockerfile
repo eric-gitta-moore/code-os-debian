@@ -197,7 +197,7 @@ RUN source ~/.zshrc && \
 
 # =========== 配置 docker =============
 USER root
-RUN system_id=$(awk -F= '/^ID=/{print$2}' /etc/os-release) && \
+RUN system_id=$(. /etc/os-release && echo "$ID") && \
     sudo apt-get update && sudo apt-get install -y ca-certificates curl gnupg && \
     sudo install -m 0755 -d /etc/apt/keyrings && \
     curl -fsSL https://download.docker.com/linux/${system_id}/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
