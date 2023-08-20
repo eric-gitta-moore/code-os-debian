@@ -1,1 +1,0 @@
-docker build -t code-os-debian --progress auto .
