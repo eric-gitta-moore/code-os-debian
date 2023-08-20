@@ -144,6 +144,7 @@ default_channels:
 custom_channels:
   conda-forge: https://mirror.nju.edu.cn/anaconda/cloud
   pytorch: https://mirror.nju.edu.cn/anaconda/cloud
+  nvidia: https://mirrors.cernet.edu.cn/anaconda-extra/cloud
 EOF
 
 # pdm
