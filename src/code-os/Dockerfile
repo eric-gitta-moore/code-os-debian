@@ -1,6 +1,7 @@
-ARG IMAGE_NAME=tensorflow/tensorflow:latest
+ARG IMAGE_NAME=tensorflow/tensorflow:2.13.0
 FROM ${IMAGE_NAME} AS base
-ARG GPU_SUPPORT=off
+ARG GPU_SUPPORT=off \
+    TENSOR_VERSION=2.13.0
 
 # 使用原地址 --build-arg GITCLONE_MIIOR=""
 ARG GITCLONE_MIRROR=https://ghproxy.com/
@@ -11,7 +12,7 @@ ARG USER_PWD=linux \
     NVM_INSTALLER_URL=${GITCLONE_MIRROR}https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.4/install.sh \ 
     NVM_NODEJS_ORG_MIRROR=https://npmmirror.com/mirrors/node/ \
     NVM_SOURCE=${GITCLONE_MIRROR}https://github.com/nvm-sh/nvm.git \
-    TENSORFLOW_PACKAGE=tensorflow==2.13.0
+    TENSORFLOW_PACKAGE=tensorflow==${TENSOR_VERSION}
 
 ARG DEBIAN_FRONTEND=noninteractive
 
