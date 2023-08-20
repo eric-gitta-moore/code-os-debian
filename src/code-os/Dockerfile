@@ -197,12 +197,13 @@ RUN source ~/.zshrc && \
 
 # =========== 配置 docker =============
 USER root
-RUN sudo apt-get update && sudo apt-get install -y ca-certificates curl gnupg && \
+RUN system_id=$(awk -F= '/^ID=/{print$2}' /etc/os-release) && \
+    sudo apt-get update && sudo apt-get install -y ca-certificates curl gnupg && \
     sudo install -m 0755 -d /etc/apt/keyrings && \
-    curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
+    curl -fsSL https://download.docker.com/linux/${system_id}/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
     sudo chmod a+r /etc/apt/keyrings/docker.gpg && \
     echo \
-    "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://mirror.nju.edu.cn/docker-ce/linux/debian \
+    "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://mirror.nju.edu.cn/docker-ce/linux/${system_id} \
     "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
     sudo tee /etc/apt/sources.list.d/docker.list > /dev/null && \
     sudo apt-get update && \
