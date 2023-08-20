@@ -151,7 +151,7 @@ EOF
 
 # pdm
 RUN source ~/.zshrc && \
-    curl -sSL https://pdm.fming.dev/install-pdm.py | python3 - && \
+    curl -sSL ${GITCLONE_MIRROR}https://raw.githubusercontent.com/pdm-project/pdm/main/install-pdm.py | python3 - && \
     echo '\n\nexport PATH=$HOME/.local/bin:$PATH' >> ~/.zshrc && \
     source ~/.zshrc && \
     pdm config pypi.url https://mirror.nju.edu.cn/pypi/web/simple && \
