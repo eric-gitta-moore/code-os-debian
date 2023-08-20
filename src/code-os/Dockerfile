@@ -1,4 +1,4 @@
-ARG IMAGE_NAME=nvidia/cuda:11.8.0-base-ubuntu22.04
+ARG IMAGE_NAME=tensorflow/tensorflow:latest-gpu
 FROM ${IMAGE_NAME} AS base
 
 # 使用原地址 GITCLONE_MIIOR=
@@ -189,16 +189,6 @@ RUN git clone ${GITCLONE_MIRROR}https://github.com/jenv/jenv.git ~/.jenv && \
 
 
 # =========== @deprecated 配置 binfmt（wsl2 中非 Ubuntu 系统会有这个问题，无法启动 systemd）=============
-
-# =========== 配置 TensorFlow for python==3.9 =============
-# RUN source ~/.zshrc && \
-# conda install -c conda-forge cudatoolkit=11.8.0 && \
-# python3 -m pip install nvidia-cudnn-cu11==8.6.0.163 tensorflow==2.13 && \
-# mkdir -p $CONDA_PREFIX/etc/conda/activate.d && \
-# echo 'CUDNN_PATH=$(dirname $(python -c "import nvidia.cudnn;print(nvidia.cudnn.__file__)"))' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
-# echo 'export LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
-# source $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
-# mv $CONDA_PREFIX/lib/libtinfo.so.6 $CONDA_PREFIX/lib/libtinfo.so.6.bak # 临时解决报错：lib/libtinfo.so.6: no version information available (required by bash)
 
 # =========== 配置 pytorch =============
 RUN source ~/.zshrc && \
