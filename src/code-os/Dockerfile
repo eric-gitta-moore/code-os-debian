@@ -1,4 +1,5 @@
-FROM debian:12 AS base
+ARG IMAGE_NAME=nvidia/cuda:11.8.0-base-ubuntu22.04
+FROM ${IMAGE_NAME} AS base
 
 # 使用原地址 GITCLONE_MIIOR=
 ARG GITCLONE_MIRROR=https://ghproxy.com/
@@ -10,56 +11,21 @@ ARG USER_PWD=linux \
     NVM_NODEJS_ORG_MIRROR=https://npmmirror.com/mirrors/node/ \
     NVM_SOURCE=${GITCLONE_MIRROR}https://github.com/nvm-sh/nvm.git
 
+ARG DEBIAN_FRONTEND=noninteractive
+
 SHELL ["/bin/bash", "-c"]
 ENV SHELL=/bin/bash
 USER root
 
 # =========== 换源 =============
-# http
-RUN cat <<'EOF' > /etc/apt/sources.list
-# 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
-deb http://mirror.nju.edu.cn/debian/ bookworm main contrib non-free non-free-firmware
-# deb-src http://mirror.nju.edu.cn/debian/ bookworm main contrib non-free non-free-firmware
-
-deb http://mirror.nju.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware
-# deb-src http://mirror.nju.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware
-
-deb http://mirror.nju.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware
-# deb-src http://mirror.nju.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware
-
-deb http://mirror.nju.edu.cn/debian-security bookworm-security main contrib non-free non-free-firmware
-# deb-src http://mirror.nju.edu.cn/debian-security bookworm-security main contrib non-free non-free-firmware
-
-# deb http://security.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware
-# # deb-src http://security.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware
-EOF
-
-RUN apt update && \
-    apt install git curl wget zsh sudo vim lua5.2 -y && \
-    apt install apt-transport-https ca-certificates -y
-
-# https
-RUN cat <<'EOF' > /etc/apt/sources.list
-# 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
-deb https://mirror.nju.edu.cn/debian/ bookworm main contrib non-free non-free-firmware
-# deb-src https://mirror.nju.edu.cn/debian/ bookworm main contrib non-free non-free-firmware
-
-deb https://mirror.nju.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware
-# deb-src https://mirror.nju.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware
-
-deb https://mirror.nju.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware
-# deb-src https://mirror.nju.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware
-
-deb https://mirror.nju.edu.cn/debian-security bookworm-security main contrib non-free non-free-firmware
-# deb-src https://mirror.nju.edu.cn/debian-security bookworm-security main contrib non-free non-free-firmware
-
-# deb https://security.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware
-# # deb-src https://security.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware
-EOF
-
-RUN apt update
+RUN sed -i.bak 's#archive.ubuntu.com#mirror.nju.edu.cn#g' /etc/apt/sources.list && \
+    sed -i 's#security.ubuntu.com#mirror.nju.edu.cn#g' /etc/apt/sources.list && \
+    apt update
 
 # =========== 配置 zsh =============
+
+RUN apt update && \
+    apt install git curl wget zsh sudo vim lua5.2 -y
 
 SHELL ["/usr/bin/zsh", "-c"]
 ENV SHELL=/usr/bin/zsh
@@ -137,6 +103,30 @@ RUN sudo apt update && sudo apt install -y fonts-wqy-zenhei fonts-wqy-microhei l
 
 USER ${USER_NAME}
 
+# =========== 配置 常用工具 =============
+USER root
+RUN sudo apt update && \
+    sudo apt install -y \ 
+    rsync iputils-ping bind9-dnsutils htop screen openssh-server tree && \
+    sed -i.bak 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+USER ${USER_NAME}
+
+# =========== 配置 c++ =============
+USER root
+RUN sudo apt update && sudo apt install -y gcc g++ make cmake gdb
+USER ${USER_NAME}
+
+# =========== 配置 gui =============
+USER root
+RUN sudo apt update && sudo apt install -y x11-apps
+USER ${USER_NAME}
+
+# =========== 配置 guifont =============
+USER root
+COPY src/local.conf /etc/fonts/
+COPY src/fonts/* /usr/share/fonts/custom/
+RUN sudo fc-cache -f -v
+USER ${USER_NAME}
 
 # =========== 配置 conda =============
 RUN wget -O ~/conda.sh ${CONDA_INSTALLER_URL} && \
@@ -196,25 +186,22 @@ RUN git clone ${GITCLONE_MIRROR}https://github.com/jenv/jenv.git ~/.jenv && \
     jenv add /usr/lib/jvm/temurin-17-jdk-amd64 && \
     jenv global 11
 
-# =========== 配置 c++ =============
-USER root
-RUN sudo apt update && sudo apt install -y gcc g++ make cmake gdb
-USER ${USER_NAME}
-
-# =========== 配置 gui =============
-USER root
-RUN sudo apt update && sudo apt install -y x11-apps
-USER ${USER_NAME}
-
-# =========== 配置 guifont =============
-USER root
-COPY src/local.conf /etc/fonts/
-COPY src/fonts/* /usr/share/fonts/custom/
-RUN sudo fc-cache -f -v
-USER ${USER_NAME}
 
 # =========== @deprecated 配置 binfmt（wsl2 中非 Ubuntu 系统会有这个问题，无法启动 systemd）=============
 
+# =========== 配置 TensorFlow for python==3.9 =============
+# RUN source ~/.zshrc && \
+# conda install -c conda-forge cudatoolkit=11.8.0 && \
+# python3 -m pip install nvidia-cudnn-cu11==8.6.0.163 tensorflow==2.13 && \
+# mkdir -p $CONDA_PREFIX/etc/conda/activate.d && \
+# echo 'CUDNN_PATH=$(dirname $(python -c "import nvidia.cudnn;print(nvidia.cudnn.__file__)"))' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
+# echo 'export LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
+# source $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
+# mv $CONDA_PREFIX/lib/libtinfo.so.6 $CONDA_PREFIX/lib/libtinfo.so.6.bak # 临时解决报错：lib/libtinfo.so.6: no version information available (required by bash)
+
+# =========== 配置 pytorch =============
+RUN source ~/.zshrc && \
+    conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia -y
 
 # =========== 配置 docker =============
 USER root
@@ -230,28 +217,6 @@ RUN sudo apt-get update && sudo apt-get install -y ca-certificates curl gnupg &&
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 USER ${USER_NAME}
 
-# =========== 配置 常用工具 =============
-USER root
-RUN sudo apt update && \
-    sudo apt install -y \ 
-    rsync iputils-ping bind9-dnsutils htop screen openssh-server tree && \
-    sed -i.bak 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-USER ${USER_NAME}
-
-
-# =========== 配置 TensorFlow for python==3.9 =============
-# RUN source ~/.zshrc && \
-# conda install -c conda-forge cudatoolkit=11.8.0 && \
-# python3 -m pip install nvidia-cudnn-cu11==8.6.0.163 tensorflow==2.13 && \
-# mkdir -p $CONDA_PREFIX/etc/conda/activate.d && \
-# echo 'CUDNN_PATH=$(dirname $(python -c "import nvidia.cudnn;print(nvidia.cudnn.__file__)"))' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
-# echo 'export LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
-# source $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
-# mv $CONDA_PREFIX/lib/libtinfo.so.6 $CONDA_PREFIX/lib/libtinfo.so.6.bak # 临时解决报错：lib/libtinfo.so.6: no version information available (required by bash)
-
-# =========== 配置 pytorch =============
-# RUN source ~/.zshrc && \
-#     conda install pytorch torchvision torchaudio cpuonly -c pytorch -y
 
 # =========== 配置 容器卷 =============
 VOLUME [ "/mnt/workspace", "/mnt/data" ]
