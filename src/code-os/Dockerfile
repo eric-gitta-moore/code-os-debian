@@ -1,7 +1,8 @@
-ARG IMAGE_NAME=tensorflow/tensorflow:latest-gpu
+ARG IMAGE_NAME=tensorflow/tensorflow:latest
+ARG GPU_SUPPORT=off
 FROM ${IMAGE_NAME} AS base
 
-# 使用原地址 GITCLONE_MIIOR=
+# 使用原地址 --build-arg GITCLONE_MIIOR=""
 ARG GITCLONE_MIRROR=https://ghproxy.com/
 
 ARG USER_PWD=linux \
@@ -191,11 +192,6 @@ RUN git clone ${GITCLONE_MIRROR}https://github.com/jenv/jenv.git ~/.jenv && \
 
 # =========== @deprecated 配置 binfmt（wsl2 中非 Ubuntu 系统会有这个问题，无法启动 systemd）=============
 
-# =========== 配置 pytorch =============
-RUN source ~/.zshrc && \
-    conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia -y
-RUN :
-
 # =========== 配置 docker =============
 USER root
 RUN system_id=$(. /etc/os-release && echo "$ID") && \
@@ -210,6 +206,16 @@ RUN system_id=$(. /etc/os-release && echo "$ID") && \
     sudo apt-get update && \
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 USER ${USER_NAME}
+RUN :
+
+# =========== 配置 pytorch =============
+RUN source ~/.zshrc && \
+    if [ "$GPU_SUPPORT" = "on" ]; then \
+    conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia -y \
+    endif && \
+    if [ "$GPU_SUPPORT" = "off" ]; then \
+    conda install pytorch torchvision torchaudio cpuonly -c pytorch -y \
+    endif
 
 
 # =========== 配置 容器卷 =============
