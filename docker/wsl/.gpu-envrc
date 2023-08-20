@@ -1,0 +1,1 @@
+export COMPOSE_FILE=../base/compose.yml:compose.yml:compose-gpu.yml

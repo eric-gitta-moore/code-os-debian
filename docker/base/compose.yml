@@ -9,13 +9,6 @@ services:
       - os-data:/mnt/data:rw
       - /var/run/docker.sock:/var/run/docker.sock
     network_mode: "host"
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [ gpu ]
 
 volumes:
   os-data:
