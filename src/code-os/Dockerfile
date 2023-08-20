@@ -164,20 +164,6 @@ RUN source ~/.zshrc && \
     pdm config pypi.url https://mirror.nju.edu.cn/pypi/web/simple && \
     pip config set global.index-url https://mirror.nju.edu.cn/pypi/web/simple
 
-# TensorFlow for python==3.9
-RUN source ~/.zshrc && \
-    conda install -c conda-forge cudatoolkit=11.8.0 && \
-    python3 -m pip install nvidia-cudnn-cu11==8.6.0.163 tensorflow==2.13 && \
-    mkdir -p $CONDA_PREFIX/etc/conda/activate.d && \
-    echo 'CUDNN_PATH=$(dirname $(python -c "import nvidia.cudnn;print(nvidia.cudnn.__file__)"))' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
-    echo 'export LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
-    source $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
-    mv $CONDA_PREFIX/lib/libtinfo.so.6 $CONDA_PREFIX/lib/libtinfo.so.6.bak # 临时解决报错：lib/libtinfo.so.6: no version information available (required by bash)
-
-# pytorch
-RUN source ~/.zshrc && \
-    conda install pytorch torchvision torchaudio cpuonly -c pytorch -y
-
 # =========== 配置 nvm =============
 RUN curl -o- ${NVM_INSTALLER_URL} | bash && \
     source ~/.zshrc && \
@@ -251,6 +237,21 @@ RUN sudo apt update && \
     rsync iputils-ping bind9-dnsutils htop screen openssh-server tree && \
     sed -i.bak 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 USER ${USER_NAME}
+
+
+# =========== 配置 TensorFlow for python==3.9 =============
+# RUN source ~/.zshrc && \
+# conda install -c conda-forge cudatoolkit=11.8.0 && \
+# python3 -m pip install nvidia-cudnn-cu11==8.6.0.163 tensorflow==2.13 && \
+# mkdir -p $CONDA_PREFIX/etc/conda/activate.d && \
+# echo 'CUDNN_PATH=$(dirname $(python -c "import nvidia.cudnn;print(nvidia.cudnn.__file__)"))' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
+# echo 'export LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
+# source $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh && \
+# mv $CONDA_PREFIX/lib/libtinfo.so.6 $CONDA_PREFIX/lib/libtinfo.so.6.bak # 临时解决报错：lib/libtinfo.so.6: no version information available (required by bash)
+
+# =========== 配置 pytorch =============
+# RUN source ~/.zshrc && \
+#     conda install pytorch torchvision torchaudio cpuonly -c pytorch -y
 
 # =========== 配置 容器卷 =============
 VOLUME [ "/mnt/workspace", "/mnt/data" ]
