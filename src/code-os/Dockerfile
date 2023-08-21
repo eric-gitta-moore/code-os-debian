@@ -11,8 +11,7 @@ ARG USER_PWD=linux \
     CONDA_INSTALLER_URL=https://mirror.nju.edu.cn/anaconda/miniconda/Miniconda3-py39_23.5.2-0-Linux-x86_64.sh \
     NVM_INSTALLER_URL=${GITCLONE_MIRROR}https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.4/install.sh \ 
     NVM_NODEJS_ORG_MIRROR=https://npmmirror.com/mirrors/node/ \
-    NVM_SOURCE=${GITCLONE_MIRROR}https://github.com/nvm-sh/nvm.git \
-    TENSORFLOW_PACKAGE=tensorflow==${TENSOR_VERSION}
+    NVM_SOURCE=${GITCLONE_MIRROR}https://github.com/nvm-sh/nvm.git
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -212,16 +211,21 @@ RUN :
 
 # =========== 配置 TensorFlow =============
 RUN source ~/.zshrc && \
-    pip install ${TENSORFLOW_PACKAGE}
+    : && \
+    if [[ "${GPU_SUPPORT}" == "on" ]]; then \
+    pip install tensorflow==${TENSOR_VERSION} \
+    else \
+    pip install tensorflow-cpu==${TENSOR_VERSION} \
+    fi
 
 # =========== 配置 pytorch =============
 RUN source ~/.zshrc && \
     echo "GPU_SUPPORT: ${GPU_SUPPORT}" && \
     if [[ "${GPU_SUPPORT}" == "on" ]]; then \
-    conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia -y; \
+    conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia -y \
     fi && \
     if [[ "${GPU_SUPPORT}" == "off" ]]; then \
-    conda install pytorch torchvision torchaudio cpuonly -c pytorch -y; \
+    conda install pytorch torchvision torchaudio cpuonly -c pytorch -y \
     fi
 
 
