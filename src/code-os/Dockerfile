@@ -228,5 +228,7 @@ RUN source ~/.zshrc && \
 # =========== 配置 容器卷 =============
 VOLUME [ "/mnt/workspace", "/mnt/data" ]
 
+# =========== 删除不必要的垃圾 =============
+ENV DEBIAN_FRONTEND=
 
 CMD [ "tail", "-f", "/dev/null" ]
