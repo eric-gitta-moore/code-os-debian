@@ -222,7 +222,7 @@ RUN source ~/.zshrc && \
     echo "GPU_SUPPORT: ${GPU_SUPPORT}" && \
     if [[ "${GPU_SUPPORT}" == "on" ]]; then \
     conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia -y; \
-    else && \
+    else \
     conda install pytorch torchvision torchaudio cpuonly -c pytorch -y; \
     fi
 
