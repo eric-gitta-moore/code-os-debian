@@ -211,21 +211,19 @@ RUN :
 
 # =========== 配置 TensorFlow =============
 RUN source ~/.zshrc && \
-    : && \
     if [[ "${GPU_SUPPORT}" == "on" ]]; then \
-    pip install tensorflow==${TENSOR_VERSION} \
+    pip install tensorflow==${TENSOR_VERSION}; \
     else \
-    pip install tensorflow-cpu==${TENSOR_VERSION} \
+    pip install tensorflow-cpu==${TENSOR_VERSION}; \
     fi
 
 # =========== 配置 pytorch =============
 RUN source ~/.zshrc && \
     echo "GPU_SUPPORT: ${GPU_SUPPORT}" && \
     if [[ "${GPU_SUPPORT}" == "on" ]]; then \
-    conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia -y \
-    fi && \
-    if [[ "${GPU_SUPPORT}" == "off" ]]; then \
-    conda install pytorch torchvision torchaudio cpuonly -c pytorch -y \
+    conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia -y; \
+    else && \
+    conda install pytorch torchvision torchaudio cpuonly -c pytorch -y; \
     fi
 
 
