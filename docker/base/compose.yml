@@ -1,7 +1,7 @@
 name: code-os-debian
 services:
   os:
-    build: ../../src/code-os
+    image: jamescurtisfoxmail/code-os
     volumes:
       - ~/.ssh:/home/linux/.ssh:rw
       - ~/workspace:/mnt/workspace:rw
