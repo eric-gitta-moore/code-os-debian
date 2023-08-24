@@ -9,6 +9,7 @@ services:
       - os-data:/mnt/data:rw
       - /var/run/docker.sock:/var/run/docker.sock
     network_mode: "host"
+    privileged: true
 
 volumes:
   os-data:
