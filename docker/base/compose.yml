@@ -4,9 +4,10 @@ services:
     image: jamescurtisfoxmail/code-os
     volumes:
       - ~/.ssh:/home/linux/.ssh:rw
+      - home-data:/home/linux:rw
+      - os-data:/mnt/data:rw
       - ~/workspace:/mnt/workspace:rw
       - /tmp/.X11-unix:/tmp/.X11-unix:ro
-      - os-data:/mnt/data:rw
       - /var/run/docker.sock:/var/run/docker.sock
     network_mode: "host"
     privileged: true
